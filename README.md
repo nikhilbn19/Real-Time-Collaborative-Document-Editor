@@ -74,12 +74,14 @@ Frontend runs at http://localhost:3000
 
 Project Structure
 server/    # Node.js + Express + Socket.IO backend
+
   ├── migrations/   # Knex migration scripts
   ├── routes/       # REST APIs
   ├── sockets/      # Socket.IO events
   └── redis.js      # Redis client config
 
 client/    # React frontend
+
   ├── src/components/   # Editor, Chat, etc.
   ├── src/context/      # Socket context
   └── src/api/          # Axios API client
