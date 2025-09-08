@@ -1,0 +1,32 @@
+# Node dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+pnpm-lock.yaml
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+
+# Logs
+logs
+*.log
+*.out
+*.err
+
+# OS / IDE files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Build artifacts
+dist/
+build/
+coverage/
+
+# Knex migration backups
+*.sqlite3

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Socket Test</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  </head>
+  <body>
+    <h1>Socket.IO Test</h1>
+    <input id="username" placeholder="Enter username" />
+    <input id="docId" placeholder="Enter docId" value="1" />
+    <button id="join">Join Document</button>
+    <br /><br />
+    <textarea id="editor" rows="10" cols="50"></textarea>
+    <br />
+    <input id="chatInput" placeholder="Type chat..." />
+    <button id="sendChat">Send</button>
+
+    <pre id="log"></pre>
+
+    <script>
+      const socket = io("http://localhost:5000");
+
+      function log(msg) {
+        document.getElementById("log").textContent += msg + "\n";
+      }
+
+      document.getElementById("join").onclick = () => {
+        const username = document.getElementById("username").value;
+        const docId = document.getElementById("docId").value;
+        socket.emit("join_doc", { docId, username });
+
+        // on document load
+        socket.on("document_load", (data) => {
+          log("Loaded doc: " + JSON.stringify(data));
+          document.getElementById("editor").value = data.document.content;
+        });
+
+        // presence update
+        socket.on("presence_update", (p) => {
+          log("Presence: " + JSON.stringify(p));
+        });
+
+        // remote edit
+        socket.on("remote_edit", (e) => {
+          log("Remote edit from " + e.from);
+          document.getElementById("editor").value = e.content;
+        });
+
+        // remote cursor
+        socket.on("remote_cursor", (c) => {
+          log("Remote cursor: " + JSON.stringify(c));
+        });
+
+        // new chat
+        socket.on("new_chat", (msg) => {
+          log("Chat: " + msg.username + " -> " + msg.message);
+        });
+      };
+
+      // when typing, send edits
+      document.getElementById("editor").addEventListener("input", (e) => {
+        const username = document.getElementById("username").value;
+        const docId = document.getElementById("docId").value;
+        socket.emit("edit", { docId, content: e.target.value });
+      });
+
+      // send cursor position
+      document.getElementById("editor").addEventListener("click", (e) => {
+        const username = document.getElementById("username").value;
+        const docId = document.getElementById("docId").value;
+        const cursor = { position: e.target.selectionStart };
+        socket.emit("cursor_update", { docId, cursor });
+      });
+
+      // send chat
+      document.getElementById("sendChat").onclick = () => {
+        const username = document.getElementById("username").value;
+        const docId = document.getElementById("docId").value;
+        const message = document.getElementById("chatInput").value;
+        socket.emit("chat_message", { docId, username, message });
+        document.getElementById("chatInput").value = "";
+      };
+    </script>
+  </body>
+</html>
